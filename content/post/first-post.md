@@ -181,3 +181,20 @@ eth0      Link encap:Ethernet  HWaddr 02:42:AC:15:00:0C
   * 从结果可以看出这个方式的局限性比较大，还会在k8s集群内增加一个不可用的节点（仅仅为了网络通信），calico是不推荐这么做的
   * 参考[https://lqingcloud.cn/post/calico-03/](https://lqingcloud.cn/post/calico-03/)
 * 使用telepresence来打通本地和k8s的网络
+  * 下载`telepresence`工具
+  ```shell
+  amd64 : sudo curl -fL https://app.getambassador.io/download/tel2/darwin/amd64/latest/telepresence -o /usr/local/bin/telepresence && sudo chmod a+x /usr/local/bin/telepresence
+  arm64 : sudo curl -fL https://app.getambassador.io/download/tel2/darwin/arm64/latest/telepresence -o /usr/local/bin/telepresence && sudo chmod a+x /usr/local/bin/telepresence
+  ```
+  * 安装`triffic manager`
+  ```shell
+  telepresence helm install --kubeconfig=~/./kube/config # kubeconfig 默认使用 ~/.kube/config 如有特殊可以指定
+  ```
+  * 启动`telepresence`
+  ```shell
+  telepresence connect --kubeconfig=~/.kube/config # kubeconfig 默认使用 ~/.kube/config 如有特殊可以指定
+  ```
+  * 连接成功之后，就可以直接访问k8s网络了
+  ```shell
+  ping xxxx-service.<namespace>
+  ```
