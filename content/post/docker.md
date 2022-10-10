@@ -106,3 +106,12 @@ editPost:
        * 那么如果你是要修改只读层的文件呢，这时候就需要在读写层先拷贝，然后修改，最后挂载的时候会因为层的顺序，吧原有的只读层文件给"遮盖"掉，这样就达到了修改文件的目的
     3. Init层
        * Init 层是 Docker 项目单独生成的一个内部层，专门用来存放 /etc/hosts、/etc/resolv.conf 等信息。
+
+### docker exec 命令是怎么进入容器的
+* 前面提到了容器的本质是进程，那一个容器启动之后只是他的视图被改变了（使用Linux Namespace 实现隔离），那 `docker exec xxx /bin/bash` 
+  命令也是启动一个进程（/bin/bash），那怎么实现让新启动的这个进程和容器进程的视图一样呢，那就是加入到这个目标容器的 Namespace 中，这样不就
+  实现了两个进程在同一个视图下。
+* 因为一个容器正常启动是需要很多 Namespace 的，所以只需要吧 /bin/bash 这个进程加入到所有的这些 Namespace 中即可
+* 可以想象一下，既然可以通过加入 Namespace 的方式和已存在的容器共享视图，那如果想让两个容器的网络连接在一起，是不是只需要将两个容器进程的
+  网络Namespace公用就行，类似 `docker run -it --net container:4ddf4638572d busybox ifconfig`，那这个 `--net` 就是将两个容
+  器的网络连接到一起了，同理其他的 Namespace 也是一样的
